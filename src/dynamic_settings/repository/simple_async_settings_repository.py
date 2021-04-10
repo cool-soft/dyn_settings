@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from dynamic_settings.repository.async_settings_repository import AsyncSettingsRepository
 
@@ -19,6 +19,13 @@ class SimpleAsyncSettingsRepository(AsyncSettingsRepository):
     async def set_one(self, setting_name: str, setting_value: Any) -> None:
         self._logger.debug(f"Setting {setting_name} is set to {setting_value}")
         self._settings[setting_name] = setting_value
+
+    async def get_many(self, setting_names: List[str]) -> Dict[str, Any]:
+        self._logger.debug(f"Requested settings: {setting_names}")
+        settings = {}
+        for name in setting_names:
+            settings[name] = self._settings.get(name)
+        return settings
 
     async def get_all(self) -> Dict[str, Any]:
         self._logger.debug(f"All settings are requested")
