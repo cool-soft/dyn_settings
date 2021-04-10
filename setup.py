@@ -9,10 +9,6 @@ setup(
     author_email='',
     description='',
     zip_safe=False,
-    packages=find_packages(
-        where='src',
-        # include=['my_package', 'my_package.*'],
-        # exclude=['my_package_test', 'my_package_test.*']
-    ),
+    packages=find_packages(where='src'),
     package_dir={'': 'src'},
 )
