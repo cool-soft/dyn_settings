@@ -27,6 +27,10 @@ class SimpleAsyncSettingsRepository(AsyncSettingsRepository):
             settings[name] = self._settings.get(name)
         return settings
 
+    async def set_many(self, settings: Dict[str, Any]) -> None:
+        self._logger.debug("Set many settings is requested")
+        self._settings.update(settings)
+
     async def get_all(self) -> Dict[str, Any]:
         self._logger.debug(f"All settings are requested")
         settings = self._settings.copy()

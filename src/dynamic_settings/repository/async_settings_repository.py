@@ -12,6 +12,9 @@ class AsyncSettingsRepository:
     async def get_many(self, setting_names: List[str]) -> Dict[str, Any]:
         raise NotImplementedError
 
+    async def set_many(self, settings: Dict[str, Any]) -> None:
+        raise NotImplementedError
+
     async def get_all(self) -> Dict[str, Any]:
         raise NotImplementedError
 
