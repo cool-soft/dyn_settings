@@ -1,7 +1,7 @@
 import pytest
 
 
-class BaseOperationsTest:
+class BaseRepositoryOperationsTest:
 
     @pytest.mark.asyncio
     async def test_set_one_get_one(self, repository):
