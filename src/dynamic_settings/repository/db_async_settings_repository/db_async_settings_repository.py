@@ -75,7 +75,7 @@ class DBAsyncSettingsRepository(AsyncSettingsRepository):
 
         async with self._db_session_factory() as session:
             statement = select(Setting)
-            settings: Iterator[Setting] = await session.execute(statement)
+            settings: Iterator[Setting] = (await session.execute(statement)).scalars().all()
 
         converted_settings = self._convert_settings_to_python_types(settings)
         return converted_settings
@@ -86,8 +86,9 @@ class DBAsyncSettingsRepository(AsyncSettingsRepository):
         converted_settings = self._convert_settings_to_db_format(settings)
         async with self._db_session_factory() as session:
             statement = select(Setting)
-            selected_settings = await session.execute(statement)
-            await selected_settings.delete()
+            selected_settings = (await session.execute(statement)).scalars().all()
+            for selected_setting in selected_settings:
+                await session.delete(selected_setting)
             for setting in converted_settings:
                 await session.merge(setting)
             await session.commit()
