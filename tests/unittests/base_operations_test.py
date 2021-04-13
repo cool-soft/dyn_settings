@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -8,7 +8,7 @@ class BaseRepositoryOperationsTest:
     @pytest.mark.asyncio
     async def test_set_one_get_one(self, repository):
         setting_name = "setting"
-        values = [None, True, False, 10, 50.23, "string value", datetime.now()]
+        values = [None, True, False, 10, 50.23, "string value", datetime.now(), timedelta(seconds=123.45)]
 
         for setting_value in values:
             await repository.set_one(setting_name, setting_value)
@@ -25,7 +25,8 @@ class BaseRepositoryOperationsTest:
             "setting_3": 10,
             "setting_4": 50.23,
             "setting_5": "string value",
-            "setting_6": datetime.now()
+            "setting_6": datetime.now(),
+            "setting_7": timedelta(seconds=123.45)
         }
 
         await repository.set_many(settings)
@@ -37,8 +38,8 @@ class BaseRepositoryOperationsTest:
     @pytest.mark.asyncio
     async def test_set_all_get_all(self, repository):
         fake_setting = {
-            "setting_7": 1,
-            "setting_8": None
+            "setting_20": 1,
+            "setting_21": None
         }
 
         settings = {
@@ -48,7 +49,8 @@ class BaseRepositoryOperationsTest:
             "setting_3": 10,
             "setting_4": 50.23,
             "setting_5": "string value",
-            "setting_6": datetime.now()
+            "setting_6": datetime.now(),
+            "setting_7": timedelta(seconds=123.45)
         }
 
         await repository.set_many(fake_setting)

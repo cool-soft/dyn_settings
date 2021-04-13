@@ -40,7 +40,8 @@ class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
             dtype_converters.FloatDTypeConverter(),
             dtype_converters.IntDTypeConverter(),
             dtype_converters.StrDTypeConverter(),
-            dtype_converters.NoneDTypeConverter()
+            dtype_converters.NoneDTypeConverter(),
+            dtype_converters.TimedeltaDTypeConverter()
         ]
         return converters
 
