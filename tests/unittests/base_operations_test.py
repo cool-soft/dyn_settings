@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 
 
@@ -5,17 +7,22 @@ class BaseRepositoryOperationsTest:
 
     @pytest.mark.asyncio
     async def test_set_one_get_one(self, repository):
-        setting_name = "setting1"
-        setting_value = 10
-
-        await repository.set_one(setting_name, setting_value)
-        assert setting_value == await repository.get_one(setting_name)
+        setting_name = "setting"
+        values = [None, True, False, 10, 50.23, "string value", datetime.now()]
+        for setting_value in values:
+            await repository.set_one(setting_name, setting_value)
+            assert setting_value == await repository.get_one(setting_name)
 
     @pytest.mark.asyncio
     async def test_set_many_get_many(self, repository):
         settings = {
-            "a": 10,
-            "b": "b"
+            "setting_0": None,
+            "setting_1": True,
+            "setting_2": False,
+            "setting_3": 10,
+            "setting_4": 50.23,
+            "setting_5": "string value",
+            "setting_6": datetime.now()
         }
 
         await repository.set_many(settings)
@@ -25,11 +32,22 @@ class BaseRepositoryOperationsTest:
 
     @pytest.mark.asyncio
     async def test_set_all_get_all(self, repository):
-        settings = {
-            "a": 10,
-            "b": "b"
+        fake_setting = {
+            "setting_7": 1,
+            "setting_8": None
         }
 
+        settings = {
+            "setting_0": None,
+            "setting_1": True,
+            "setting_2": False,
+            "setting_3": 10,
+            "setting_4": 50.23,
+            "setting_5": "string value",
+            "setting_6": datetime.now()
+        }
+
+        await repository.set_many(fake_setting)
         await repository.set_all(settings)
         result_settings = await repository.get_all()
         assert settings == result_settings
