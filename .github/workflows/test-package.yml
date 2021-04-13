@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  run-unittest-tests:
+  run-package-tests:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v2

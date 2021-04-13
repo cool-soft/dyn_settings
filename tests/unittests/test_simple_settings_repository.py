@@ -1,10 +1,10 @@
 import pytest
 
-from unittests.base_operations_test import BaseOperationsTest
+from unittests.base_operations_test import BaseRepositoryOperationsTest
 from dynamic_settings.repository.simple_async_settings_repository import SimpleAsyncSettingsRepository
 
 
-class TestSimpleSettingsRepositoryBaseOperations(BaseOperationsTest):
+class TestSimpleSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
 
     @pytest.fixture
     def repository(self):
