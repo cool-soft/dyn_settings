@@ -25,4 +25,9 @@ jobs:
         run: python -m pytest -rA tests
 
       - name: Run coverage
-        run: python -m pytest --cov=src tests
+        run: python -m pytest --cov=src --cov-report html:cov_html tests
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: cov_html
