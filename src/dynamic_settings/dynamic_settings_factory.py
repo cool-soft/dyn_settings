@@ -4,7 +4,7 @@ from typing import List, Optional, Any, Dict
 from dynamic_settings.repository.settings_repository import SettingsRepository
 
 
-class AsyncDSFactory:
+class DSFactory:
 
     def __init__(self,
                  class_: Optional = None,
