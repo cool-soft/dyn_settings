@@ -11,3 +11,5 @@ src/dynamic_settings.egg-info/
 .coverage
 
 cov_html/
+
+pytest-report.html
