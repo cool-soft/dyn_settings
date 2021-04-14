@@ -35,12 +35,13 @@ class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
     @pytest.fixture
     def converters(self):
         converters = [
-            dtype_converters.BooleanDTypeConverter,
-            dtype_converters.DatetimeDTypeConverter,
-            dtype_converters.FloatDTypeConverter,
-            dtype_converters.IntDTypeConverter,
-            dtype_converters.StrDTypeConverter,
-            dtype_converters.NoneDTypeConverter
+            dtype_converters.BooleanDTypeConverter(),
+            dtype_converters.DatetimeDTypeConverter(),
+            dtype_converters.FloatDTypeConverter(),
+            dtype_converters.IntDTypeConverter(),
+            dtype_converters.StrDTypeConverter(),
+            dtype_converters.NoneDTypeConverter(),
+            dtype_converters.TimedeltaDTypeConverter()
         ]
         return converters
 

@@ -21,4 +21,4 @@ jobs:
       - name: Install dependencies
         run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Run tests
-        run: python -m pytest -v tests
+        run: python -m pytest -rA tests
