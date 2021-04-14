@@ -52,6 +52,7 @@ class DSFactory:
     async def create_instance(self) -> Any:
         self._logger.debug(f"Creating instance of {self._class.__name__}")
 
+        raise Exception
         args = self._args.copy()
         kwargs = self._kwargs.copy()
 
