@@ -5,3 +5,7 @@ venv/
 **/__pycache__/
 # Byte-compiled / optimized / DLL files
 *.py[cod]
+
+src/dynamic_settings.egg-info/
+
+.coverage

@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 
-class AsyncSettingsRepository:
+class SettingsRepository:
 
     async def get_one(self, setting_name: str) -> Any:
         raise NotImplementedError

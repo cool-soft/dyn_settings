@@ -1,14 +1,14 @@
 import logging
 from typing import List, Optional, Any, Dict
 
-from dynamic_settings.repository.async_settings_repository import AsyncSettingsRepository
+from dynamic_settings.repository.settings_repository import SettingsRepository
 
 
 class AsyncDSFactory:
 
     def __init__(self,
                  class_: Optional = None,
-                 settings_repository: Optional[AsyncSettingsRepository] = None,
+                 settings_repository: Optional[SettingsRepository] = None,
                  settings_names: Optional[List[str]] = None,
                  args: Optional[List[Any]] = None,
                  kwargs: Optional[Dict[str, Any]] = None) -> None:
@@ -33,7 +33,7 @@ class AsyncDSFactory:
         self._logger.debug(f"Class is set to {class_.__name__}")
         self._class = class_
 
-    def set_settings_repository(self, repository: AsyncSettingsRepository) -> None:
+    def set_settings_repository(self, repository: SettingsRepository) -> None:
         self._logger.debug(f"Settings repository is set to {repository.__class__.__name__}")
         self._settings_repository = repository
 

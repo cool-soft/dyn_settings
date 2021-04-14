@@ -5,10 +5,10 @@ from sqlalchemy.future import select
 
 from .dtype_converters import DTypeConverter
 from .setting_model import Setting
-from ..async_settings_repository import AsyncSettingsRepository
+from ..settings_repository import SettingsRepository
 
 
-class DBAsyncSettingsRepository(AsyncSettingsRepository):
+class DBSettingsRepository(SettingsRepository):
 
     def __init__(self,
                  session_factory: Optional[Callable] = None,
