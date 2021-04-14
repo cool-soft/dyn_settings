@@ -38,4 +38,4 @@ jobs:
         if: ${{!cancelled()}}
         with:
           name: code-coverage-report
-          path: cov_html
+          path: coverage_html_report
