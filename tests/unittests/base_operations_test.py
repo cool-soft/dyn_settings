@@ -18,6 +18,7 @@ class BaseRepositoryOperationsTest:
 
     @pytest.mark.asyncio
     async def test_set_many_get_many(self, repository):
+        raise Exception
         settings = {
             "setting_0": None,
             "setting_1": True,
