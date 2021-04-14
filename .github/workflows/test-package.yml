@@ -25,8 +25,17 @@ jobs:
 
       - name: Run tests and code coverage analisis
         run: python -m pytest
+
+      - name: Archive pytest results
+        uses: actions/upload-artifact@v2
+        if: ${{!cancelled()}}
+        with:
+          name: pytest-report
+          path: pytest-report.html
+
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
+        if: ${{!cancelled()}}
         with:
           name: code-coverage-report
           path: cov_html
