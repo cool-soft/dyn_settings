@@ -1,1 +1,2 @@
 from .db_settings_repository import DBSettingsRepository
+from .db_settings_repository_with_cache import DBSettingsRepositoryWithCache
