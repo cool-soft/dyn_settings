@@ -14,8 +14,7 @@ class AsyncDynamicSettingsDIService:
                  settings_repository: Optional[SettingsRepository] = None,
                  dynamic_config: Optional[Configuration] = None,
                  configuration_lock: Optional[RWLock] = None,
-                 defaults: Optional[Dict[str, Any]]=None) -> None:
-
+                 defaults: Optional[Dict[str, Any]] = None) -> None:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._logger.debug("Creating instance")
 
@@ -52,7 +51,7 @@ class AsyncDynamicSettingsDIService:
 
         async with self._configuration_lock.writer_lock:
             await self._settings_repository.set_many(settings)
-            self._configuration.update(settings)
+            self._configuration.from_dict(settings)
 
         self._logger.debug(f"Settings are set")
 
