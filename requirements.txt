@@ -1,4 +1,6 @@
+aiorwlock~=1.0.0
 aiosqlite~=0.17.0
+dependency-injector~=4.31.2
 pytest~=6.2.3
 pytest-asyncio~=0.14.0
 pytest-cov~=2.11.1
