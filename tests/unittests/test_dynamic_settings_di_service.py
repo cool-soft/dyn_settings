@@ -1,3 +1,5 @@
+from copy import copy
+
 import pytest
 from aiorwlock import RWLock
 from dependency_injector import providers
@@ -46,14 +48,15 @@ class SettingsContainer(DeclarativeContainer):
         dtype_converters=converters
     )
 
-    dynamic_configuration = providers.Configuration()
-
-    configuration_rwlock = providers.Singleton(RWLock)
+    dynamic_config = providers.Configuration()
+    dynamic_config_rwlock = providers.Singleton(RWLock)
+    defaults = providers.Configuration()
 
     settings_service = providers.Singleton(AsyncDynamicSettingsDIService,
                                            settings_repository=settings_repository,
-                                           configuration=dynamic_configuration.provider,
-                                           configuration_lock=configuration_rwlock)
+                                           dynamic_config=dynamic_config.provider,
+                                           configuration_lock=dynamic_config_rwlock,
+                                           defaults=defaults)
 
 
 class TestDynamicSettingsDIService:
@@ -66,22 +69,34 @@ class TestDynamicSettingsDIService:
         }
 
     @pytest.fixture
-    def settings_pkg(self):
+    def default_settings(self):
+        return {
+            "setting_a": 10,
+            "setting_c": False
+        }
+
+    @pytest.fixture
+    def settings_pkg(self, default_settings):
         container = SettingsContainer()
+        container.defaults.from_dict(default_settings)
         return container
 
     @pytest.mark.asyncio
-    async def test_dynamic_settings_di_service(self, settings_pkg, settings):
+    async def test_dynamic_settings_di_service(self, settings_pkg, settings, default_settings):
         db_engine = settings_pkg.db_engine()
         await instant_db_settings_schema(db_engine)
 
         settings_service: AsyncDynamicSettingsDIService = settings_pkg.settings_service()
+        await settings_service.initialize_repository_and_config()
         await settings_service.set_settings(settings)
 
-        result_settings = {}
-        lock: RWLock = settings_pkg.configuration_rwlock()
-        async with lock.reader_lock:
-            for setting_name in settings.keys():
-                result_settings[setting_name] = settings_pkg.dynamic_configuration.get(setting_name)
+        combined_settings = copy(default_settings)
+        combined_settings.update(settings)
 
-        assert settings == result_settings
+        result_settings = {}
+        lock: RWLock = settings_pkg.dynamic_config_rwlock()
+        async with lock.reader_lock:
+            for setting_name in combined_settings.keys():
+                result_settings[setting_name] = settings_pkg.dynamic_config.get(setting_name)
+
+        assert combined_settings == result_settings

@@ -39,7 +39,8 @@ class BaseRepositoryOperationsTest:
     async def test_set_all_get_all(self, repository):
         fake_setting = {
             "setting_20": 1,
-            "setting_21": None
+            "setting_21": None,
+            "setting_0": False
         }
 
         settings = {

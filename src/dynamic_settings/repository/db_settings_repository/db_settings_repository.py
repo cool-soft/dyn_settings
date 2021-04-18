@@ -83,12 +83,13 @@ class DBSettingsRepository(SettingsRepository):
     async def set_all(self, settings: Dict[str, Any]) -> None:
         self._logger.debug(f"Set all settings is requested")
 
-        converted_settings = self._convert_settings_to_db_format(settings)
         async with self._db_session_factory() as session:
-            statement = select(Setting)
+            setting_names = list(settings.keys())
+            statement = select(Setting).filter(Setting.name.not_in(setting_names))
             selected_settings = (await session.execute(statement)).scalars().all()
             for selected_setting in selected_settings:
                 await session.delete(selected_setting)
+            converted_settings = self._convert_settings_to_db_format(settings)
             for setting in converted_settings:
                 await session.merge(setting)
             await session.commit()
