@@ -19,8 +19,8 @@ class AsyncDynamicSettingsDIService:
         self._logger.debug("Creating instance")
 
         self._settings_repository = settings_repository
-        self._configuration = dynamic_config
-        self._configuration_lock = configuration_lock
+        self._dynamic_config = dynamic_config
+        self._dynamic_config_rwlock = configuration_lock
         if defaults is None:
             defaults = {}
         self._defaults = copy(defaults)
@@ -36,11 +36,11 @@ class AsyncDynamicSettingsDIService:
 
     def set_dynamic_config(self, configuration: Configuration):
         self._logger.debug(f"Configuration is set to {configuration}")
-        self._configuration = configuration
+        self._dynamic_config = configuration
 
-    def set_configuration_lock(self, lock: RWLock):
+    def set_dynamic_config_rwlock(self, lock: RWLock):
         self._logger.debug(f"Configuration lock is set to {lock}")
-        self._configuration_lock = lock
+        self._dynamic_config_rwlock = lock
 
     def set_defaults(self, defaults: Dict[str, Any]):
         self._logger.debug(f"Defaults are set to {defaults}")
@@ -49,18 +49,21 @@ class AsyncDynamicSettingsDIService:
     async def set_settings(self, settings: Dict[str, Any]) -> None:
         self._logger.debug(f"Set {len(settings)} settings")
 
-        async with self._configuration_lock.writer_lock:
+        async with self._dynamic_config_rwlock.writer_lock:
             await self._settings_repository.set_many(settings)
-            self._configuration.from_dict(settings)
+            new_settings = self._dynamic_config()
+            new_settings.update(settings)
+            self._dynamic_config.reset_override()
+            self._dynamic_config.from_dict(new_settings)
 
         self._logger.debug(f"Settings are set")
 
     async def initialize_repository_and_config(self):
         self._logger.debug("Initialization of repository")
 
-        async with self._configuration_lock.writer_lock:
+        async with self._dynamic_config_rwlock.writer_lock:
             current_settings = await self._settings_repository.get_all()
             new_settings = copy(self._defaults)
             new_settings.update(current_settings)
             await self._settings_repository.set_all(new_settings)
-            self._configuration.update(new_settings)
+            self._dynamic_config.update(new_settings)
