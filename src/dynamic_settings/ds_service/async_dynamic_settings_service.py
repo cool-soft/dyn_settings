@@ -22,12 +22,12 @@ class AsyncDynamicSettingsService:
             defaults = {}
         self._defaults = copy(defaults)
 
-        self._logger.debug(f"Settings repository is {settings_repository}")
+        self._logger.debug(f"Settings settings_repository is {settings_repository}")
         self._logger.debug(f"Configuration lock is {settings_rwlock}")
         self._logger.debug(f"Default settings {defaults}")
 
     def set_settings_repository(self, repository: SettingsRepository):
-        self._logger.debug(f"Settings repository is set to {repository}")
+        self._logger.debug(f"Settings settings_repository is set to {repository}")
         self._settings_repository = repository
 
     def set_settings_rwlock(self, lock: RWLock):
@@ -47,7 +47,7 @@ class AsyncDynamicSettingsService:
         self._logger.debug(f"Settings are set")
 
     async def initialize_repository(self):
-        self._logger.debug("Initialization of repository")
+        self._logger.debug("Initialization of settings_repository")
 
         async with self._settings_rwlock.writer_lock:
             current_settings = await self._settings_repository.get_all()
