@@ -1,4 +1,5 @@
 import pytest
+from aiorwlock import RWLock
 
 from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
 from dynamic_settings.dynamic_settings_factory import DSFactory
@@ -49,11 +50,16 @@ class TestDSFactory:
         return list(settings.keys())
 
     @pytest.fixture
-    def factory(self, class_, repository_with_settings, args, kwargs, setting_names):
+    async def settings_lock(self):
+        return RWLock()
+
+    @pytest.fixture
+    async def factory(self, class_, repository_with_settings, args, kwargs, setting_names, settings_lock):
         # noinspection PyTypeChecker
         return DSFactory(
             class_=class_,
             settings_repository=repository_with_settings,
+            settings_rwlock=settings_lock,
             args=args,
             kwargs=kwargs,
             settings_names=setting_names
@@ -61,6 +67,7 @@ class TestDSFactory:
 
     @pytest.mark.asyncio
     async def test_creating_instance(self, factory, args, kwargs, settings):
+        # noinspection PyUnresolvedReferences
         instance = await factory.create_instance()
 
         settings_with_kwargs = settings.copy()
