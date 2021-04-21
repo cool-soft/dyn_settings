@@ -3,7 +3,7 @@ from copy import copy
 import pytest
 from aiorwlock import RWLock
 
-from dynamic_settings.ds_service.async_dynamic_settings_service import AsyncDynamicSettingsService
+from dynamic_settings.service.async_dynamic_settings_service import AsyncDynamicSettingsService
 from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
 
 
