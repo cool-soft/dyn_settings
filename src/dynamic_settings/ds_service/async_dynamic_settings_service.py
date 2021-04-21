@@ -1,6 +1,6 @@
 import logging
 from copy import copy
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 from aiorwlock import RWLock
 
@@ -45,6 +45,15 @@ class AsyncDynamicSettingsService:
             await self._settings_repository.set_many(settings)
 
         self._logger.debug(f"Settings are set")
+
+    async def get_settings(self, settings_names: List[str]) -> Dict[str, Any]:
+        self._logger.debug(f"Requested settings: {settings_names}")
+
+        async with self._settings_rwlock.reader_lock:
+            settings = await self._settings_repository.get_many(settings_names)
+
+        self._logger.debug(f"Settings are get")
+        return settings
 
     async def initialize_repository(self):
         self._logger.debug("Initialization of settings_repository")

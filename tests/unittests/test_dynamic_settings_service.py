@@ -58,5 +58,8 @@ class TestDynamicSettingsService:
 
         async with settings_rwlock.reader_lock:
             result_settings = await settings_repository.get_many(setting_names)
-
         assert combined_settings == result_settings
+
+        async with settings_rwlock.reader_lock:
+            result_settings2 = await settings_service.get_settings(setting_names)
+        assert combined_settings == result_settings2
