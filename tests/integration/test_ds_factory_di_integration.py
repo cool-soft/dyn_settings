@@ -3,7 +3,7 @@ from aiorwlock import RWLock
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Object, Dependency, Container
 
-from dynamic_settings.ds_service.async_dynamic_settings_service import AsyncDynamicSettingsService
+from dynamic_settings.service.async_dynamic_settings_service import AsyncDynamicSettingsService
 from dynamic_settings.dynamic_settings_factory import DSFactory
 from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
 
@@ -29,25 +29,22 @@ class FactoryContainer(containers.DeclarativeContainer):
     args = Dependency()
     kwargs = Dependency()
     setting_names = Dependency()
-
     settings_repository = Dependency()
-    settings_rwlock = Dependency()
 
     factory = Singleton(
         DSFactory,
         class_=Object(PublicArgsKWArgsStructure),
         settings_repository=settings_repository,
-        settings_rwlock=settings_rwlock,
+        settings_names=setting_names,
         args=args,
-        kwargs=kwargs,
-        settings_names=setting_names
+        kwargs=kwargs
     )
 
 
 class DynamicSettingsContainer(containers.DeclarativeContainer):
 
     settings_repository = Dependency()
-    settings_rwlock = Dependency()
+    settings_rwlock = Singleton(RWLock)
     default_settings = Object(None)
 
     settings_service = Singleton(AsyncDynamicSettingsService,
@@ -65,15 +62,12 @@ class FactoryUserContainer(containers.DeclarativeContainer):
 
 class ApplicationContainer(containers.DeclarativeContainer):
     settings_repository = Singleton(SimpleSettingsRepository)
-    settings_rwlock = Singleton(RWLock)
 
     settings_pkg = Container(DynamicSettingsContainer,
-                             settings_repository=settings_repository,
-                             settings_rwlock=settings_rwlock)
+                             settings_repository=settings_repository)
 
     factory_pkg = Container(FactoryContainer,
-                            settings_repository=settings_repository,
-                            settings_rwlock=settings_rwlock)
+                            settings_repository=settings_repository)
 
     factory_user_pkg = Container(FactoryUserContainer,
                                  factory=factory_pkg.factory)
