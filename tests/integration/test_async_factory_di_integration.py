@@ -1,11 +1,10 @@
 import pytest
-from aiorwlock import RWLock
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Object, Dependency, Container
 
-from dynamic_settings.service.async_dynamic_settings_service import AsyncDynamicSettingsService
-from dynamic_settings.dynamic_settings_factory import DSFactory
+from dynamic_settings.factory.async_factory import AsyncFactory
 from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
+from dynamic_settings.service.async_settings_service import AsyncSettingsService
 
 
 class PublicArgsKWArgsStructure:
@@ -17,7 +16,7 @@ class PublicArgsKWArgsStructure:
 
 class FactoryUser:
 
-    def __init__(self, factory: DSFactory):
+    def __init__(self, factory: AsyncFactory):
         self.factory = factory
         self.instance = None
 
@@ -29,12 +28,12 @@ class FactoryContainer(containers.DeclarativeContainer):
     args = Dependency()
     kwargs = Dependency()
     setting_names = Dependency()
-    settings_repository = Dependency()
+    settings_service = Dependency()
 
     factory = Singleton(
-        DSFactory,
+        AsyncFactory,
         class_=Object(PublicArgsKWArgsStructure),
-        settings_repository=settings_repository,
+        settings_service=settings_service,
         settings_names=setting_names,
         args=args,
         kwargs=kwargs
@@ -43,13 +42,11 @@ class FactoryContainer(containers.DeclarativeContainer):
 
 class DynamicSettingsContainer(containers.DeclarativeContainer):
 
-    settings_repository = Dependency()
-    settings_rwlock = Singleton(RWLock)
+    settings_repository = Singleton(SimpleSettingsRepository)
     default_settings = Object(None)
 
-    settings_service = Singleton(AsyncDynamicSettingsService,
+    settings_service = Singleton(AsyncSettingsService,
                                  settings_repository=settings_repository,
-                                 settings_rwlock=settings_rwlock,
                                  defaults=default_settings)
 
 
@@ -61,13 +58,11 @@ class FactoryUserContainer(containers.DeclarativeContainer):
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
-    settings_repository = Singleton(SimpleSettingsRepository)
 
-    settings_pkg = Container(DynamicSettingsContainer,
-                             settings_repository=settings_repository)
+    settings_pkg = Container(DynamicSettingsContainer)
 
     factory_pkg = Container(FactoryContainer,
-                            settings_repository=settings_repository)
+                            settings_service=settings_pkg.settings_service)
 
     factory_user_pkg = Container(FactoryUserContainer,
                                  factory=factory_pkg.factory)

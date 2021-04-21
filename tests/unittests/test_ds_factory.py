@@ -1,6 +1,7 @@
 import pytest
+from dynamic_settings.service.async_settings_service import AsyncSettingsService
 
-from dynamic_settings.dynamic_settings_factory import DSFactory
+from dynamic_settings.factory.async_factory import AsyncFactory
 from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
 
 
@@ -19,9 +20,12 @@ class TestDSFactory:
         }
 
     @pytest.fixture
-    async def repository_with_settings(self, repository, settings):
-        await repository.set_many(settings)
-        return repository
+    def settings_names(self, settings):
+        return list(settings.keys())
+
+    @pytest.fixture
+    def settings_service(self, repository):
+        return AsyncSettingsService(settings_repository=repository)
 
     @pytest.fixture
     def args(self):
@@ -45,23 +49,19 @@ class TestDSFactory:
         return SomeClass
 
     @pytest.fixture
-    def setting_names(self, settings):
-        return list(settings.keys())
-
-    @pytest.fixture
-    async def factory(self, class_, repository_with_settings, args, kwargs, setting_names):
-        # noinspection PyTypeChecker
-        return DSFactory(
+    def factory(self, class_, settings_service, args, kwargs, settings_names):
+        return AsyncFactory(
             class_=class_,
-            settings_repository=repository_with_settings,
+            settings_service=settings_service,
+            settings_names=settings_names,
             args=args,
-            kwargs=kwargs,
-            settings_names=setting_names
+            kwargs=kwargs
         )
 
     @pytest.mark.asyncio
-    async def test_creating_instance(self, factory, args, kwargs, settings):
-        # noinspection PyUnresolvedReferences
+    async def test_creating_instance(self, factory, settings_service, args, kwargs, settings):
+        await settings_service.set_settings(settings)
+
         instance = await factory.create_instance()
 
         settings_with_kwargs = settings.copy()

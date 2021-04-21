@@ -7,32 +7,26 @@ from aiorwlock import RWLock
 from dynamic_settings.repository.settings_repository import SettingsRepository
 
 
-class AsyncDynamicSettingsService:
+class AsyncSettingsService:
 
     def __init__(self,
                  settings_repository: Optional[SettingsRepository] = None,
-                 settings_rwlock: Optional[RWLock] = None,
                  defaults: Optional[Dict[str, Any]] = None) -> None:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._logger.debug("Creating instance")
 
         self._settings_repository = settings_repository
-        self._settings_rwlock = settings_rwlock
+        self.__settings_lock = None
         if defaults is None:
             defaults = {}
         self._defaults = copy(defaults)
 
         self._logger.debug(f"Settings settings_repository is {settings_repository}")
-        self._logger.debug(f"Configuration lock is {settings_rwlock}")
         self._logger.debug(f"Default settings {defaults}")
 
-    def set_settings_repository(self, repository: SettingsRepository):
+    def set_settings_repository(self, repository: SettingsRepository) -> None:
         self._logger.debug(f"Settings settings_repository is set to {repository}")
         self._settings_repository = repository
-
-    def set_settings_rwlock(self, lock: RWLock):
-        self._logger.debug(f"Settings rwlock is set to {lock}")
-        self._settings_rwlock = lock
 
     def set_defaults(self, defaults: Dict[str, Any]):
         self._logger.debug(f"Defaults are set to {defaults}")
@@ -41,7 +35,8 @@ class AsyncDynamicSettingsService:
     async def set_settings(self, settings: Dict[str, Any]) -> None:
         self._logger.debug(f"Set {len(settings)} settings")
 
-        async with self._settings_rwlock.writer_lock:
+        settings_lock = await self.get_settings_lock()
+        async with settings_lock.writer_lock:
             await self._settings_repository.set_many(settings)
 
         self._logger.debug(f"Settings are set")
@@ -49,7 +44,8 @@ class AsyncDynamicSettingsService:
     async def get_settings(self, settings_names: List[str]) -> Dict[str, Any]:
         self._logger.debug(f"Requested settings: {settings_names}")
 
-        async with self._settings_rwlock.reader_lock:
+        settings_lock = await self.get_settings_lock()
+        async with settings_lock.writer_lock:
             settings = await self._settings_repository.get_many(settings_names)
 
         self._logger.debug(f"Settings are get")
@@ -58,8 +54,18 @@ class AsyncDynamicSettingsService:
     async def initialize_repository(self):
         self._logger.debug("Initialization of settings_repository")
 
-        async with self._settings_rwlock.writer_lock:
+        settings_lock = await self.get_settings_lock()
+        async with settings_lock.writer_lock:
             current_settings = await self._settings_repository.get_all()
             new_settings = copy(self._defaults)
             new_settings.update(current_settings)
             await self._settings_repository.set_all(new_settings)
+
+    async def get_settings_lock(self) -> RWLock:
+        self._logger.debug("Settings RWLock is requested")
+
+        if self.__settings_lock is None:
+            self._logger.debug("Creating settings rwlock")
+            self.__settings_lock = RWLock()
+
+        return self.__settings_lock
