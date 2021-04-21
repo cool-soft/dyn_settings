@@ -57,9 +57,6 @@ class DSFactory:
         self._logger.debug(f"Keyword args are set to {kwargs}")
         self._kwargs = kwargs
 
-    async def __call__(self):
-        return await self.create_instance()
-
     async def create_instance(self) -> Any:
         self._logger.debug(f"Creating instance of {self._class.__name__}")
 
