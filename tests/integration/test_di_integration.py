@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import datetime
 
 import pytest
@@ -32,7 +33,7 @@ class SettingsContainer(containers.DeclarativeContainer):
     )
 
 
-class TestDSFactoryDIIntegration:
+class TestDIIntegration:
 
     @pytest.fixture
     def settings(self):
@@ -61,3 +62,11 @@ class TestDSFactoryDIIntegration:
         await settings_service.set_many_settings_async(settings)
         instance: PublicArgsKWArgsStructure = instance_factory()
         assert instance.kwargs == settings
+
+        await settings_service.set_one_setting_async("setting_2", 10.5)
+        updated_settings = copy(settings)
+        # noinspection PyTypeChecker
+        updated_settings["setting_2"] = 10.5
+        instance2: PublicArgsKWArgsStructure = instance_factory()
+        assert instance2.kwargs == updated_settings
+        assert instance.kwargs != updated_settings

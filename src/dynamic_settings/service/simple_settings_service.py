@@ -35,7 +35,7 @@ class SimpleSettingsService(SettingsService):
         self._logger.debug(f"Defaults are set to {defaults}")
         self._defaults = defaults
 
-    async def set_one_settings_async(self, setting_name: str, setting_value: Any) -> None:
+    async def set_one_setting_async(self, setting_name: str, setting_value: Any) -> None:
         self._logger.debug(f"Set {setting_name} = {setting_value} async")
         with self._settings_lock:
             await self._settings_repository.set_one(setting_name, setting_value)
