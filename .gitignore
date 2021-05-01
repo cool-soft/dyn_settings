@@ -5,7 +5,7 @@ venv/
 **/__pycache__/
 *.py[cod]
 
-src/dynamic_settings.egg-info/
+src/*.egg-info/
 
 .coverage
 coverage_html_report/

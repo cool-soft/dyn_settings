@@ -8,5 +8,4 @@ class TestSimpleSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
 
     @pytest.fixture
     def repository(self):
-        repository = SimpleSettingsRepository()
-        return repository
+        return SimpleSettingsRepository()
