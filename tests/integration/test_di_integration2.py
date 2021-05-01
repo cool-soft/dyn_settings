@@ -3,10 +3,13 @@ from datetime import datetime
 
 import pytest
 from dependency_injector import containers
-from dependency_injector.providers import Singleton, Factory, Coroutine
+from dependency_injector.providers import Singleton, Factory, Coroutine, Resource
+from sqlalchemy import orm
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
+from dynamic_settings.repository.db_settings_repository import DBSettingsRepository, dtype_converters
+from dynamic_settings.repository.db_settings_repository.setting_model import Setting
 from dynamic_settings.repository.settings_repository import AbstractSettingsRepository
-from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
 
 
 class Instance1:
@@ -25,9 +28,43 @@ async def get_setting(settings_repository: AbstractSettingsRepository, setting_n
     return await settings_repository.get_one(setting_name)
 
 
-class SettingsContainer(containers.DeclarativeContainer):
+async def create_db(db_url):
+    db_engine = create_async_engine(db_url)
+    async with db_engine.begin() as conn:
+        await conn.run_sync(Setting.metadata.drop_all)
+        await conn.run_sync(Setting.metadata.create_all)
+    return db_engine
 
-    settings_repository = Singleton(SimpleSettingsRepository)
+
+class SettingsContainer(containers.DeclarativeContainer):
+    db = Resource(
+        create_db,
+        db_url="sqlite+aiosqlite:///:memory:"
+    )
+
+    session_maker = Factory(
+        orm.sessionmaker,
+        autocommit=False,
+        autoflush=False,
+        bind=db,
+        class_=AsyncSession
+    )
+
+    session_factory = Factory(orm.scoped_session, session_maker)
+
+    settings_repository = Singleton(
+        DBSettingsRepository,
+        session_factory=session_factory,
+        dtype_converters=[
+            dtype_converters.BooleanDTypeConverter(),
+            dtype_converters.DatetimeDTypeConverter(),
+            dtype_converters.FloatDTypeConverter(),
+            dtype_converters.IntDTypeConverter(),
+            dtype_converters.StrDTypeConverter(),
+            dtype_converters.NoneDTypeConverter(),
+            dtype_converters.TimedeltaDTypeConverter()
+        ]
+    )
 
     instance1 = Factory(
         Instance1,
@@ -39,8 +76,7 @@ class SettingsContainer(containers.DeclarativeContainer):
     instance2 = Factory(Instance2, instance1)
 
 
-class TestDIIntegration:
-
+class TestDIIntegration2:
     settings = {
         "setting_0": 0,
         "setting_1": "abc",
@@ -60,14 +96,15 @@ class TestDIIntegration:
         return settings_container.instance2
 
     @pytest.fixture
-    def settings_repository(self, settings_container):
-        return settings_container.settings_repository()
+    @pytest.mark.asyncio
+    async def settings_repository(self, settings_container):
+        return await settings_container.settings_repository()
 
+    # noinspection PyUnresolvedReferences
     @pytest.mark.asyncio
     async def test_creating_instance(self,
                                      instance1_factory,
                                      settings_repository):
-
         await settings_repository.set_many(self.settings)
         instance1_1: Instance1 = await instance1_factory()
         assert instance1_1.kwargs == self.settings
@@ -80,6 +117,7 @@ class TestDIIntegration:
         assert instance1_2.kwargs == updated_settings
         assert instance1_1.kwargs != updated_settings
 
+    # noinspection PyUnresolvedReferences
     @pytest.mark.asyncio
     async def test_injecting_instance(self,
                                       instance2_factory,

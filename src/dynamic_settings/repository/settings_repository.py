@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 
-class SettingsRepository:
+class AbstractSettingsRepository:
 
     async def get_one(self, setting_name: str) -> Any:
         raise NotImplementedError

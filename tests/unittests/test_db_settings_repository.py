@@ -10,13 +10,11 @@ from unittests.base_operations_test import BaseRepositoryOperationsTest
 
 class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
 
-    @pytest.fixture
-    def db_url(self):
-        return "sqlite+aiosqlite:///:memory:"
+    db_url = "sqlite+aiosqlite:///:memory:"
 
     @pytest.fixture()
-    async def db(self, db_url):
-        db_engine = create_async_engine(db_url)
+    async def db(self):
+        db_engine = create_async_engine(self.db_url)
         async with db_engine.begin() as conn:
             await conn.run_sync(Setting.metadata.drop_all)
             await conn.run_sync(Setting.metadata.create_all)
@@ -47,7 +45,4 @@ class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
 
     @pytest.fixture
     def repository(self, db_session_factory, converters):
-        repository = DBSettingsRepository()
-        repository.set_db_session_factory(db_session_factory)
-        repository.set_dtype_converters(converters)
-        return repository
+        return DBSettingsRepository(db_session_factory, converters)

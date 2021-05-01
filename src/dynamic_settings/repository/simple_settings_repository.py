@@ -1,10 +1,10 @@
 import logging
 from typing import Any, Dict, List
 
-from dynamic_settings.repository.settings_repository import SettingsRepository
+from dynamic_settings.repository.settings_repository import AbstractSettingsRepository
 
 
-class SimpleSettingsRepository(SettingsRepository):
+class SimpleSettingsRepository(AbstractSettingsRepository):
 
     def __init__(self) -> None:
         self._logger = logging.getLogger(self.__class__.__name__)

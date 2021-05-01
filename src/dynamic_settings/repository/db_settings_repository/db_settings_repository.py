@@ -1,37 +1,27 @@
 import logging
-from typing import Any, Dict, List, Optional, Callable, Iterator
+from typing import Any, Dict, List, Callable, Iterator
 
 from sqlalchemy.future import select
 
 from .dtype_converters import DTypeConverter
 from .setting_model import Setting
-from ..settings_repository import SettingsRepository
+from ..settings_repository import AbstractSettingsRepository
 
 
-class DBSettingsRepository(SettingsRepository):
+class DBSettingsRepository(AbstractSettingsRepository):
 
     def __init__(self,
-                 session_factory: Optional[Callable] = None,
-                 dtype_converters: Optional[List[DTypeConverter]] = None) -> None:
+                 session_factory: Callable,
+                 dtype_converters: List[DTypeConverter]) -> None:
 
         self._logger = logging.getLogger(self.__class__.__name__)
         self._logger.debug("Creating instance")
 
         self._db_session_factory = session_factory
-        if dtype_converters is None:
-            dtype_converters = []
         self._dtype_converters = dtype_converters.copy()
 
         self._logger.debug(f"Db session factory is set to {session_factory}; "
                            f"Set {len(dtype_converters)} converters")
-
-    def set_db_session_factory(self, session_factory: Callable):
-        self._logger.debug(f"Session factory is set to {session_factory}")
-        self._db_session_factory = session_factory
-
-    def set_dtype_converters(self, dtype_converters: List[DTypeConverter]):
-        self._logger.debug(f"Set {len(dtype_converters)} converters")
-        self._dtype_converters = dtype_converters.copy()
 
     async def get_one(self, setting_name: str) -> Any:
         self._logger.debug(f"Requested setting {setting_name}")
@@ -118,7 +108,7 @@ class DBSettingsRepository(SettingsRepository):
 
         return converted_value
 
-    def _convert_settings_to_db_format(self, settings: Dict[str, Any]):
+    def _convert_settings_to_db_format(self, settings: Dict[str, Any]) -> List[Setting]:
         self._logger.debug("Converting settings to db format")
 
         converted_settings = []
