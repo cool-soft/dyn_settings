@@ -5,8 +5,8 @@ import pytest
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Coroutine
 
-from dynamic_settings.repository.settings_repository import AbstractSettingsRepository
-from dynamic_settings.repository.simple_settings_repository import SimpleSettingsRepository
+from dynamic_settings.repository.abstract_settings_repository import AbstractSettingsRepository
+from dynamic_settings.repository.dict_settings_repository import DictSettingsRepository
 
 
 class Instance1:
@@ -27,7 +27,7 @@ async def get_setting(settings_repository: AbstractSettingsRepository, setting_n
 
 class SettingsContainer(containers.DeclarativeContainer):
 
-    settings_repository = Singleton(SimpleSettingsRepository)
+    settings_repository = Singleton(DictSettingsRepository)
 
     instance1 = Factory(
         Instance1,

@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 
 from .dtype_converters import DTypeConverter
 from .setting_model import Setting
-from ..settings_repository import AbstractSettingsRepository
+from ..abstract_settings_repository import AbstractSettingsRepository
 
 
 class DBSettingsRepository(AbstractSettingsRepository):
