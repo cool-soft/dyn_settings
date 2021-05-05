@@ -7,10 +7,10 @@ from dependency_injector.providers import Singleton, Factory, Coroutine, Resourc
 from sqlalchemy import orm
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
+from dynamic_settings.di_helpers import get_one_setting
 from dynamic_settings.repository.db_settings_repository import DBSettingsRepository
 from dynamic_settings.repository.db_settings_repository import dtype_converters
 from dynamic_settings.repository.db_settings_repository.setting_model import Setting
-from dynamic_settings.repository.abstract_settings_repository import AbstractSettingsRepository
 
 
 class Instance1:
@@ -23,10 +23,6 @@ class Instance2:
 
     def __init__(self, public_instance):
         self.public_instance = public_instance
-
-
-async def get_setting(settings_repository: AbstractSettingsRepository, setting_name: str) -> None:
-    return await settings_repository.get_one(setting_name)
 
 
 async def create_db(db_url):
@@ -69,9 +65,9 @@ class SettingsContainer(containers.DeclarativeContainer):
 
     instance1 = Factory(
         Instance1,
-        setting_0=Coroutine(get_setting, settings_repository, "setting_0"),
-        setting_1=Coroutine(get_setting, settings_repository, "setting_1"),
-        setting_2=Coroutine(get_setting, settings_repository, "setting_2"),
+        setting_0=Coroutine(get_one_setting, settings_repository, "setting_0"),
+        setting_1=Coroutine(get_one_setting, settings_repository, "setting_1"),
+        setting_2=Coroutine(get_one_setting, settings_repository, "setting_2"),
     )
 
     instance2 = Factory(Instance2, instance1)

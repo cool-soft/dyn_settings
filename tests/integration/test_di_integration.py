@@ -5,7 +5,7 @@ import pytest
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Coroutine
 
-from dynamic_settings.repository.abstract_settings_repository import AbstractSettingsRepository
+from dynamic_settings.di_helpers import get_one_setting
 from dynamic_settings.repository.dict_settings_repository import DictSettingsRepository
 
 
@@ -21,19 +21,15 @@ class Instance2:
         self.public_instance = public_instance
 
 
-async def get_setting(settings_repository: AbstractSettingsRepository, setting_name: str) -> None:
-    return await settings_repository.get_one(setting_name)
-
-
 class SettingsContainer(containers.DeclarativeContainer):
 
     settings_repository = Singleton(DictSettingsRepository)
 
     instance1 = Factory(
         Instance1,
-        setting_0=Coroutine(get_setting, settings_repository, "setting_0"),
-        setting_1=Coroutine(get_setting, settings_repository, "setting_1"),
-        setting_2=Coroutine(get_setting, settings_repository, "setting_2"),
+        setting_0=Coroutine(get_one_setting, settings_repository, "setting_0"),
+        setting_1=Coroutine(get_one_setting, settings_repository, "setting_1"),
+        setting_2=Coroutine(get_one_setting, settings_repository, "setting_2"),
     )
 
     instance2 = Factory(Instance2, instance1)
