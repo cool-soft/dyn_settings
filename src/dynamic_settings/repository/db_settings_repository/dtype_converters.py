@@ -6,12 +6,11 @@ class DTypeConverter:
     PYTHON_TYPE: type
     TYPE_NAME: str
 
-    @staticmethod
-    def to_db_format(value: Any) -> str:
+    def to_db_format(self, value: Any) -> str:
         raise NotImplementedError
 
     @staticmethod
-    def to_python_type(value: str) -> Any:
+    def to_python_type(self, value: str) -> Any:
         raise NotImplementedError
 
 
@@ -19,12 +18,10 @@ class IntDTypeConverter(DTypeConverter):
     PYTHON_TYPE = int
     TYPE_NAME = "integer"
 
-    @staticmethod
-    def to_db_format(value: int) -> str:
+    def to_db_format(self, value: int) -> str:
         return str(value)
 
-    @staticmethod
-    def to_python_type(value: str) -> int:
+    def to_python_type(self, value: str) -> int:
         return int(value)
 
 
@@ -32,12 +29,10 @@ class FloatDTypeConverter(DTypeConverter):
     PYTHON_TYPE = float
     TYPE_NAME = "float"
 
-    @staticmethod
-    def to_db_format(value: float) -> str:
+    def to_db_format(self, value: float) -> str:
         return str(value)
 
-    @staticmethod
-    def to_python_type(value: str) -> float:
+    def to_python_type(self, value: str) -> float:
         return float(value)
 
 
@@ -45,12 +40,10 @@ class StrDTypeConverter(DTypeConverter):
     PYTHON_TYPE = str
     TYPE_NAME = "string"
 
-    @staticmethod
-    def to_db_format(value: str) -> str:
+    def to_db_format(self, value: str) -> str:
         return value
 
-    @staticmethod
-    def to_python_type(value: str) -> str:
+    def to_python_type(self, value: str) -> str:
         return value
 
 
@@ -58,12 +51,10 @@ class NoneDTypeConverter(DTypeConverter):
     PYTHON_TYPE = type(None)
     TYPE_NAME = "none"
 
-    @staticmethod
-    def to_db_format(value: Any) -> str:
+    def to_db_format(self, value: Any) -> str:
         return ""
 
-    @staticmethod
-    def to_python_type(value: str) -> None:
+    def to_python_type(self, value: str) -> None:
         return None
 
 
@@ -71,12 +62,10 @@ class BooleanDTypeConverter(DTypeConverter):
     PYTHON_TYPE = bool
     TYPE_NAME = "boolean"
 
-    @staticmethod
-    def to_db_format(value: bool) -> str:
+    def to_db_format(self, value: bool) -> str:
         return str(value)
 
-    @staticmethod
-    def to_python_type(value: str) -> bool:
+    def to_python_type(self, value: str) -> bool:
         if value == "True":
             converted_value = True
         else:
@@ -88,12 +77,10 @@ class DatetimeDTypeConverter(DTypeConverter):
     PYTHON_TYPE = datetime
     TYPE_NAME = "datetime"
 
-    @staticmethod
-    def to_db_format(value: datetime) -> str:
+    def to_db_format(self, value: datetime) -> str:
         return value.isoformat()
 
-    @staticmethod
-    def to_python_type(value: str) -> datetime:
+    def to_python_type(self, value: str) -> datetime:
         return datetime.fromisoformat(value)
 
 
@@ -101,10 +88,8 @@ class TimedeltaDTypeConverter(DTypeConverter):
     PYTHON_TYPE = timedelta
     TYPE_NAME = "timedelta"
 
-    @staticmethod
-    def to_db_format(value: timedelta) -> str:
+    def to_db_format(self, value: timedelta) -> str:
         return str(value.total_seconds())
 
-    @staticmethod
-    def to_python_type(value: str) -> timedelta:
+    def to_python_type(self, value: str) -> timedelta:
         return timedelta(seconds=float(value))

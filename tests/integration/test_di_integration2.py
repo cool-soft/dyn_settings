@@ -7,9 +7,10 @@ from dependency_injector.providers import Singleton, Factory, Coroutine, Resourc
 from sqlalchemy import orm
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from dynamic_settings.repository.db_settings_repository import DBSettingsRepository, dtype_converters
+from dynamic_settings.repository.db_settings_repository import DBSettingsRepository
+from dynamic_settings.repository.db_settings_repository import dtype_converters
 from dynamic_settings.repository.db_settings_repository.setting_model import Setting
-from dynamic_settings.repository.settings_repository import AbstractSettingsRepository
+from dynamic_settings.repository.abstract_settings_repository import AbstractSettingsRepository
 
 
 class Instance1:
