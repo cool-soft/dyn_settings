@@ -9,7 +9,6 @@ class DTypeConverter:
     def to_db_format(self, value: Any) -> str:
         raise NotImplementedError
 
-    @staticmethod
     def to_python_type(self, value: str) -> Any:
         raise NotImplementedError
 

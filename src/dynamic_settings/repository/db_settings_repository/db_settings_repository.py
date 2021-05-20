@@ -71,7 +71,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
         return converted_settings
 
     async def set_all(self, settings: Dict[str, Any]) -> None:
-        self._logger.debug(f"Set all settings is requested")
+        self._logger.debug("Set all settings is requested")
 
         async with self._db_session_factory() as session:
             setting_names = list(settings.keys())
