@@ -32,10 +32,10 @@ class DictSettingsRepository(AbstractSettingsRepository):
         self._settings.update(settings)
 
     async def get_all(self) -> Dict[str, Any]:
-        self._logger.debug(f"All settings are requested")
+        self._logger.debug("All settings are requested")
         settings = self._settings.copy()
         return settings
 
     async def set_all(self, settings: Dict[str, Any]) -> None:
-        self._logger.debug(f"Set all settings is requested")
+        self._logger.debug("Set all settings is requested")
         self._settings = settings.copy()
