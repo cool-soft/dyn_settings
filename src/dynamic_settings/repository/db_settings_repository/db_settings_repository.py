@@ -107,7 +107,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
                 converted_value = converter.to_python_type(setting.value)
                 break
         else:
-            raise RuntimeError(f"Converter not found for type {setting.type}")
+            raise ValueError(f"Converter not found for type {setting.type}")
 
         return converted_value
 
@@ -134,6 +134,6 @@ class DBSettingsRepository(AbstractSettingsRepository):
                 setting = Setting(name=setting_name, type=converter.TYPE_NAME, value=converted_value)
                 break
         else:
-            raise RuntimeError(f"Converter not found for type {type(setting_value)}")
+            raise ValueError(f"Converter not found for type {type(setting_value)}")
 
         return setting

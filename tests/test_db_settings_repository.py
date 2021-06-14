@@ -46,3 +46,11 @@ class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
     @pytest.fixture
     def repository(self, db_session_factory, converters):
         return DBSettingsRepository(db_session_factory, converters)
+
+    @pytest.mark.asyncio
+    async def test_incorrect_datatype_storing(self, repository):
+        class IncorrectDataType:
+            pass
+
+        with pytest.raises(ValueError):
+            await repository.set_one("incorrect_setting", IncorrectDataType())
