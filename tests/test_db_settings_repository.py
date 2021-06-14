@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from dynamic_settings.repository.db_settings_repository import DBSettingsRepository
 from dynamic_settings.repository.db_settings_repository import dtype_converters
 from dynamic_settings.repository.db_settings_repository.setting_model import Setting
-from unittests.base_operations_test import BaseRepositoryOperationsTest
+from base_operations_test import BaseRepositoryOperationsTest
 
 
 class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):

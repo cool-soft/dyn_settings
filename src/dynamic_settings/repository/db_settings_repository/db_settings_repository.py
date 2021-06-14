@@ -1,6 +1,6 @@
-import logging
 from typing import Any, Dict, List, Callable, Iterator
 
+from dynamic_settings.logger import logger
 from sqlalchemy.future import select
 
 from .dtype_converters import DTypeConverter
@@ -12,19 +12,20 @@ class DBSettingsRepository(AbstractSettingsRepository):
 
     def __init__(self,
                  session_factory: Callable,
-                 dtype_converters: List[DTypeConverter]) -> None:
-
-        self._logger = logging.getLogger(self.__class__.__name__)
-        self._logger.debug("Creating instance")
+                 dtype_converters: List[DTypeConverter]
+                 ) -> None:
 
         self._db_session_factory = session_factory
         self._dtype_converters = dtype_converters.copy()
 
-        self._logger.debug(f"Db session factory is set to {session_factory}; "
-                           f"Set {len(dtype_converters)} converters")
+        logger.debug(
+            f"Creating instance:"
+            f"session_factory: {session_factory}; "
+            f"converters count: {len(dtype_converters)}"
+        )
 
     async def get_one(self, setting_name: str) -> Any:
-        self._logger.debug(f"Requested setting {setting_name}")
+        logger.debug(f"Requested setting {setting_name}")
 
         async with self._db_session_factory() as session:
             statement = select(Setting).filter(Setting.name == setting_name)
@@ -34,7 +35,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
         return converted_setting
 
     async def set_one(self, setting_name: str, setting_value: Any) -> None:
-        self._logger.debug(f"Setting {setting_name} is set to {setting_value}")
+        logger.debug(f"Setting {setting_name} is set to {setting_value}")
 
         converted_setting = self._convert_one_setting_to_db_format(setting_name, setting_value)
         async with self._db_session_factory() as session:
@@ -42,7 +43,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
             await session.commit()
 
     async def get_many(self, setting_names: List[str]) -> Dict[str, Any]:
-        self._logger.debug(f"Requested settings: {setting_names}")
+        logger.debug(f"Requested settings: {setting_names}")
 
         async with self._db_session_factory() as session:
             statement = select(Setting).filter(Setting.name.in_(setting_names))
@@ -52,7 +53,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
         return converted_settings
 
     async def set_many(self, settings: Dict[str, Any]) -> None:
-        self._logger.debug("Set many settings is requested")
+        logger.debug("Set many settings is requested")
 
         converted_settings = self._convert_settings_to_db_format(settings)
         async with self._db_session_factory() as session:
@@ -61,7 +62,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
             await session.commit()
 
     async def get_all(self) -> Dict[str, Any]:
-        self._logger.debug("All settings are requested")
+        logger.debug("All settings are requested")
 
         async with self._db_session_factory() as session:
             statement = select(Setting)
@@ -71,7 +72,7 @@ class DBSettingsRepository(AbstractSettingsRepository):
         return converted_settings
 
     async def set_all(self, settings: Dict[str, Any]) -> None:
-        self._logger.debug("Set all settings is requested")
+        logger.debug("Set all settings is requested")
 
         async with self._db_session_factory() as session:
             setting_names = list(settings.keys())
@@ -85,19 +86,21 @@ class DBSettingsRepository(AbstractSettingsRepository):
             await session.commit()
 
     def _convert_settings_to_python_types(self, settings: Iterator[Setting]):
-        self._logger.debug("Converting settings to python type")
+        logger.debug("Converting settings to python type")
 
         converted_settings = {}
         for setting in settings:
             converted_setting_value = self._convert_one_setting_to_python_type(setting)
             converted_settings[setting.name] = converted_setting_value
 
-        self._logger.debug("Settings are converted")
+        logger.debug("Settings are converted")
         return converted_settings
 
     def _convert_one_setting_to_python_type(self, setting: Setting) -> Any:
-        self._logger.debug(f"Converting setting to python type "
-                           f"{setting.name}: {setting.type} = {setting.value}")
+        logger.debug(
+            f"Converting setting to python type "
+            f"{setting.name}: {setting.type} = {setting.value}"
+        )
 
         for converter in self._dtype_converters:
             if converter.TYPE_NAME == setting.type:
@@ -109,19 +112,21 @@ class DBSettingsRepository(AbstractSettingsRepository):
         return converted_value
 
     def _convert_settings_to_db_format(self, settings: Dict[str, Any]) -> List[Setting]:
-        self._logger.debug("Converting settings to db format")
+        logger.debug("Converting settings to db format")
 
         converted_settings = []
         for setting_name, setting_value in settings.items():
             converted_setting = self._convert_one_setting_to_db_format(setting_name, setting_value)
             converted_settings.append(converted_setting)
 
-        self._logger.debug("Settings are converted")
+        logger.debug("Settings are converted")
         return converted_settings
 
     def _convert_one_setting_to_db_format(self, setting_name: str, setting_value: Any) -> Setting:
-        self._logger.debug(f"Converting setting to db format "
-                           f"{setting_name}: {type(setting_value)} = {setting_value}")
+        logger.debug(
+            f"Converting setting to db format "
+            f"{setting_name}: {type(setting_value)} = {setting_value}"
+        )
 
         for converter in self._dtype_converters:
             if isinstance(setting_value, converter.PYTHON_TYPE):

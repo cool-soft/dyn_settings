@@ -1,6 +1,6 @@
 import pytest
 
-from unittests.base_operations_test import BaseRepositoryOperationsTest
+from base_operations_test import BaseRepositoryOperationsTest
 from dynamic_settings.repository.dict_settings_repository import DictSettingsRepository
 
 
