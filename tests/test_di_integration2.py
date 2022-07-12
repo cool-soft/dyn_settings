@@ -2,6 +2,7 @@ from copy import deepcopy
 from datetime import datetime
 
 import pytest
+import pytest_asyncio
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Coroutine, Resource
 from sqlalchemy import orm
@@ -92,8 +93,7 @@ class TestDIIntegration2:
     def instance2_factory(self, settings_container):
         return settings_container.instance2
 
-    @pytest.fixture
-    @pytest.mark.asyncio
+    @pytest_asyncio.fixture
     async def settings_repository(self, settings_container):
         return await settings_container.settings_repository()
 

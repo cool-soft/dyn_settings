@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 from sqlalchemy import orm
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
@@ -12,7 +13,7 @@ class TestDBSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
 
     db_url = "sqlite+aiosqlite:///:memory:"
 
-    @pytest.fixture()
+    @pytest_asyncio.fixture
     async def db(self):
         db_engine = create_async_engine(self.db_url)
         async with db_engine.begin() as conn:
