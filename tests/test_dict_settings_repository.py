@@ -1,10 +1,10 @@
 import pytest
 
-from base_operations_test import BaseRepositoryOperationsTest
+from base_operations_test import SyncBaseRepositoryOperationsTest
 from dynamic_settings.repository.dict_settings_repository import DictSettingsRepository
 
 
-class TestSimpleSettingsRepositoryBaseOperations(BaseRepositoryOperationsTest):
+class TestDictSettingsRepositoryBaseOperations(SyncBaseRepositoryOperationsTest):
 
     @pytest.fixture
     def repository(self):
