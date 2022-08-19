@@ -7,8 +7,6 @@ from .setting_model import Setting
 from .settings_converter import SettingsConverter
 from ..abstract_settings_repository import AbstractAsyncSettingsRepository
 
-class AsyncDBSettingsRepository:
-    pass
 
 class AsyncDBSettingsRepository(AbstractAsyncSettingsRepository):
 
