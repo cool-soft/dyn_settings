@@ -7,13 +7,14 @@ from .setting_model import Setting
 from .settings_converter import SettingsConverter
 from ..abstract_settings_repository import AbstractAsyncSettingsRepository
 
+class AsyncDBSettingsRepository:
+    pass
 
 class AsyncDBSettingsRepository(AbstractAsyncSettingsRepository):
 
     def __init__(self,
                  session_provider: Callable,
                  dtype_converter: SettingsConverter,
-                 a=123
                  ) -> None:
         self._db_session_provider = session_provider
         self._dtype_converter = dtype_converter
