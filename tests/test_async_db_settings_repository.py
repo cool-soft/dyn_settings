@@ -79,28 +79,40 @@ class TestAsyncDBSettingsRepositoryBaseOperations:
         async with session_factory.begin():
             with pytest.raises(ValueError):
                 await repository.set_one("incorrect_setting", IncorrectDataType())
+        await session_factory.remove()
 
     @pytest.mark.asyncio
     async def test_set_one_get_one(self, repository, samples, session_factory):
         setting_name = "setting"
-        async with session_factory.begin():
-            for setting_value in samples.values():
+        for setting_value in samples.values():
+            async with session_factory.begin() as session:
                 await repository.set_one(setting_name, setting_value)
+                await session.commit()
+            async with session_factory.begin():
                 result_setting = await repository.get_one(setting_name)
-                assert setting_value == result_setting
+            assert setting_value == result_setting
+        await session_factory.remove()
 
     @pytest.mark.asyncio
     async def test_set_many_get_many(self, repository, samples, session_factory):
-        async with session_factory.begin():
+        async with session_factory.begin() as session:
             await repository.set_many(samples)
+            await session.commit()
+        async with session_factory.begin():
             settings_names = list(samples.keys())
             result_settings = await repository.get_many(settings_names)
         assert samples == result_settings
+        await session_factory.remove()
 
     @pytest.mark.asyncio
     async def test_set_all_get_all(self, repository, samples, samples_2, session_factory):
-        async with session_factory.begin():
+        async with session_factory.begin() as session:
             await repository.set_many(samples_2)
+            await session.commit()
+        async with session_factory.begin() as session:
             await repository.set_all(samples)
+            await session.commit()
+        async with session_factory.begin():
             result_settings = await repository.get_all()
             assert samples == result_settings
+        await session_factory.remove()

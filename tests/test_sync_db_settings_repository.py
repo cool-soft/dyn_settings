@@ -77,25 +77,33 @@ class TestSyncDBSettingsRepositoryBaseOperations:
 
     def test_set_one_get_one(self, repository, samples, session_factory):
         setting_name = "setting"
-        with session_factory.begin():
-            for setting_value in samples.values():
+        for setting_value in samples.values():
+            with session_factory.begin() as session:
                 repository.set_one(setting_name, setting_value)
+                session.commit()
+            with session_factory.begin():
                 result_setting = repository.get_one(setting_name)
-                assert setting_value == result_setting
+            assert setting_value == result_setting
         session_factory.remove()
 
     def test_set_many_get_many(self, repository, samples, session_factory):
-        with session_factory.begin():
+        with session_factory.begin() as session:
             repository.set_many(samples)
-            settings_names = list(samples.keys())
+            session.commit()
+        settings_names = list(samples.keys())
+        with session_factory.begin():
             result_settings = repository.get_many(settings_names)
         assert samples == result_settings
         session_factory.remove()
 
     def test_set_all_get_all(self, repository, samples, samples_2, session_factory):
-        with session_factory.begin():
+        with session_factory.begin() as session:
             repository.set_many(samples_2)
+            session.commit()
+        with session_factory.begin() as session:
             repository.set_all(samples)
+            session.commit()
+        with session_factory.begin():
             result_settings = repository.get_all()
-            assert samples == result_settings
+        assert samples == result_settings
         session_factory.remove()
