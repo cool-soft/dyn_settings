@@ -12,7 +12,8 @@ class AsyncDBSettingsRepository(AbstractAsyncSettingsRepository):
 
     def __init__(self,
                  session_provider: Callable,
-                 dtype_converter: SettingsConverter
+                 dtype_converter: SettingsConverter,
+                 a
                  ) -> None:
         self._db_session_provider = session_provider
         self._dtype_converter = dtype_converter
